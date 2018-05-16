@@ -67,7 +67,8 @@ Class DB {
 			// setFetchMode(PDO::FETCH_ASSOC);
 		}
 		catch(PDOException $e) {
-			dd($e->getMessage);
+			print_r($e->getMessage);
+			die();
 		}
 	}
 
