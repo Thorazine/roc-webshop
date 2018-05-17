@@ -25,11 +25,15 @@
 
 			<a href="<?php echo router()->name('product', ['slug' => $product->slug]); ?>" class="col-md-4 product">
 				<img src="<?php echo asset('images/large/'.$product->image); ?>">
+
 				<h3><?php echo $product->title; ?></h3>
+
 				<?php echo $product->shortDescription(); ?>
+
 				<div class="product-price">
 					&euro; <?php echo $product->price; ?>
 				</div>
+
 				<button type="button" class="btn btn-warning add-to-cart" data-url="<?php echo router()->name('cart.add', ['id' => $product->id]); ?>">Voeg toe aan winkelmand!</button>
 			</a>
 

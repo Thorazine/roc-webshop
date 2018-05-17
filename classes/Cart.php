@@ -54,4 +54,14 @@ class Cart {
 
 		$_SESSION['cart']['total'] = $totalPrice;
 	}
+
+
+	public static function reset()
+	{
+		// default cart create
+		$_SESSION['cart'] = [
+			'products' => [],
+			'total' => 0.00,
+		];
+	}
 }

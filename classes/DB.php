@@ -15,31 +15,33 @@ Class DB {
 	private $orders = [];
 	private $limit = false;
 
-	public function __construct($class)
+	// connect to the DB
+	public function __construct()
 	{
-		$this->class = $class;
-		include_once 'db/'.$class.'.php';
-
 		try {
 			$this->connection = new PDO('mysql:host='.$this->host.';dbname='.$this->database, $this->username, $this->password);
 			$this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 		catch(PDOException $e) {
-			dd($e->getMessage);
+			dd($e->getMessage());
 		}
 
 		return $this;
 	}
 
-
-	public function select($select, $arguments = [])
+	// start a query
+	public function query($insert, $arguments = [])
 	{
-		$this->select = $select;
+		// reset the values
+		$this->orders = [];
+		$this->limit = false;
+
+		$this->select = $insert;
 		$this->arguments = $arguments;
 		return $this;
 	}
 
-
+	// limit the amount of return values
 	public function limit(int $amount)
 	{
 		$this->limit = $amount;
@@ -47,7 +49,7 @@ Class DB {
 		return $this;
 	}
 
-
+	// put order by in the query (multiple)
 	public function orderBy($column, $direction = 'ASC')
 	{
 		array_push($this->orders, [$column, $direction]);
@@ -55,39 +57,73 @@ Class DB {
 		return $this;
 	}
 
-
-	public function get()
+	// return all records based on query
+	public function select($class)
 	{
+		include_once 'db/'.$class.'.php';
+
 		try {
 			$result = $this->connection->prepare($this->buildQuery());
-			$result->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $this->class);
+			$result->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $class);
 			$result->execute($this->arguments);
 
 			return $result->fetchAll();
-			// setFetchMode(PDO::FETCH_ASSOC);
 		}
 		catch(PDOException $e) {
-			dd($e->getMessage);
+			dd($e->getMessage());
 		}
 	}
 
-
-	public function first()
+	// return only the first record based on query
+	public function first($class)
 	{
+		include_once 'db/'.$class.'.php';
+
 		try {
+			$this->limit(1);
 			$result = $this->connection->prepare($this->buildQuery());
-			$result->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $this->class);
+			$result->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $class);
 			$result->execute($this->arguments);
 
 			return $result->fetch();
-			// setFetchMode(PDO::FETCH_ASSOC);
 		}
 		catch(PDOException $e) {
 			dd($e->getMessage().':'.$this->buildQuery());
 		}
 	}
 
+	// run an update
+	public function update()
+	{
+		try {
+			$result = $this->connection->prepare($this->buildQuery());
+			return $result->execute($this->arguments);
+		}
+		catch(PDOException $e) {
+			dd($e->getMessage());
+		}
+	}
 
+	// run an insert
+	public function insert()
+	{
+		try {
+			$result = $this->connection->prepare($this->buildQuery());
+			$result->execute($this->arguments);
+			return $this->connection->lastInsertId();
+		}
+		catch(PDOException $e) {
+			dd($e->getMessage());
+		}
+	}
+
+	// run a delete
+	public function delete()
+	{
+
+	}
+
+	// build the query
 	private function buildQuery()
 	{
 		$query = $this->select;
@@ -110,6 +146,24 @@ Class DB {
 		$this->query = $query;
 
 		return $this->query;
+	}
+
+	// start a transaction
+	public function transaction()
+	{
+		$this->connection->beginTransaction();
+	}
+
+	// commit a transaction
+	public function commit()
+	{
+		$this->connection->commit();
+	}
+
+	// roll back a transaction
+	public function rollBack()
+	{
+		$this->connection->rollBack();
 	}
 
 }

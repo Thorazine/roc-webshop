@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-createDefaultSession();
-
 require "../classes/Memory.php";
 require "../classes/Router.php";
 require "../classes/Respond.php";
@@ -10,6 +8,9 @@ require "../classes/DB.php";
 require '../classes/Model.php';
 require '../classes/Cart.php';
 require '../app/Controllers/Controller.php';
+
+// load the composer packages
+require '../vendor/autoload.php';
 
 
 // load all the base functions
@@ -41,24 +42,23 @@ function router()
 }
 
 
-function db($class)
+function db()
 {
-	return new DB($class);
+	return Memory::getClass('DB');
 }
 
-function createDefaultSession()
+
+function lang($filename)
 {
-	if(! isset($_SESSION['cart'])) {
-		// default cart create
-		$_SESSION['cart'] = [
-			'products' => [],
-			'total' => 0.00,
-		];
-	}
+	return Memory::getFile('../lang/nl/'.$filename);
+}
+
+
+// reset the cart if it's empty
+if(! isset($_SESSION['cart'])) {
+	Cart::reset();
 }
 
 
 // Load the route and run the route we want
 router()->run();
-
-

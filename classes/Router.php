@@ -17,6 +17,7 @@ Class Router {
 	private $arguments = null;
 	private $function = null;
 	private $name = null;
+	private $redirect = false;
 
 
 	public function __construct()
@@ -97,7 +98,6 @@ Class Router {
 	}
 
 
-
 	private function pathRegex($path)
 	{
 		// escape the slashes
@@ -106,7 +106,6 @@ Class Router {
 		// replace the arguments for regex
 		return preg_replace('/[{].*[}]/U' , '([^\/]+)', $path);
 	}
-
 
 
 	private function handleUrl($path, $controller, $function, $name)
@@ -130,6 +129,8 @@ Class Router {
 			$this->name = $name;
 			$this->arguments = $arguments;
 		}
+
+		$this->resetRouterSession();
 	}
 
 
@@ -146,6 +147,68 @@ Class Router {
 			return $parameters[$argument];
 		}, $this->namedRoutes[$name]);
 
+		if($this->redirect) {
+			header('Location: '.$this->domain.$this->publicPath.trim($url, '/'));
+			die();
+		}
+
 		return $this->domain.$this->publicPath.trim($url, '/');
+	}
+
+
+	public function parameters()
+	{
+		return $this->parameters;
+	}
+
+
+	public function back($values = false, $errors = false)
+	{
+		if($values) {
+			$_SESSION['router']['values'] = $values;
+		}
+		if($errors) {
+			$_SESSION['router']['errors'] = $errors;
+		}
+
+		header('Location: '.$_SERVER['HTTP_REFERER']);
+
+		die();
+	}
+
+
+	public function value($key)
+	{
+		if(@$_SESSION['router']['values'][$key]) {
+			return $_SESSION['router']['values'][$key];
+		}
+	}
+
+
+	public function errors($key = false)
+	{
+		if($key) {
+			if(@$_SESSION['router']['errors'][$key]) {
+				return $_SESSION['router']['errors'][$key];
+			}
+		}
+		else {
+			return $_SESSION['router']['errors'];
+		}
+
+	}
+
+
+	public function resetRouterSession()
+	{
+		empty($_SESSION['router']);
+		empty($_SESSION['values']);
+	}
+
+
+	public function redirect()
+	{
+		$this->redirect = true;
+		return $this;
 	}
 }

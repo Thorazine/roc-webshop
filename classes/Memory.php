@@ -4,6 +4,7 @@ Class Memory {
 
 	// all the classes we want in memory
 	public static $classes = [];
+	public static $files = [];
 
 
 	// check if a class excists
@@ -28,5 +29,13 @@ Class Memory {
 	public static function createClass($class)
 	{
 		self::$classes[$class] = new $class;
+	}
+
+	public static function getFile($filename)
+	{
+		if(! array_key_exists($filename, self::$files)) {
+			self::$files[$filename] = include_once $filename;
+		}
+		return self::$files[$filename];
 	}
 }

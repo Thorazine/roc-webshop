@@ -17,6 +17,12 @@
 	<section class="content">
 		<h1>Betalen</h1>
 
+		<?php if(router()->errors()) { ?>
+			<div class="alert alert-danger">
+				Oeps, niet alles is correct ingevuld.
+			</div>
+		<?php } ?>
+
 		<form class="form-horizontal" action="<?php echo router()->name('pay.create'); ?>" method="POST">
 
 			<div class="form-group">
@@ -24,13 +30,16 @@
 					Naam
 				</label>
 				<div class="col-sm-3">
-					<input class="form-control" type="text" name="first_name" placeholder="Voornaam">
+					<input class="form-control" type="text" name="first_name" placeholder="Voornaam" value="<?php echo router()->value('first_name'); ?>">
+					<?php echo (router()->errors('first_name')) ? '<p class="text-danger">'.router()->errors('first_name')[0].'</p>' : ''; ?>
 				</div>
 				<div class="col-sm-2">
-					<input class="form-control" type="text" name="suffix_name" placeholder="Tussenvoegsel">
+					<input class="form-control" type="text" name="suffix_name" placeholder="Tussenvoegsel" value="<?php echo router()->value('suffix_name'); ?>">
+					<?php echo (router()->errors('suffix_name')) ? '<p class="text-danger">'.router()->errors('suffix_name')[0].'</p>' : ''; ?>
 				</div>
 				<div class="col-sm-4">
-					<input class="form-control" type="text" name="last_name" placeholder="Achternaam">
+					<input class="form-control" type="text" name="last_name" placeholder="Achternaam" value="<?php echo router()->value('last_name'); ?>">
+					<?php echo (router()->errors('last_name')) ? '<p class="text-danger">'.router()->errors('last_name')[0].'</p>' : ''; ?>
 				</div>
 			</div>
 
@@ -40,10 +49,15 @@
 				</label>
 				<div class="col-sm-9">
 					<select class="form-control" name="country" placeholder="Kies een land">
-						<option value="NL">Nederland</option>
-						<option value="BE">België</option>
-						<option value="DE">Deutchland</option>
+						<?php foreach([
+							'NL' => 'Nederland',
+							'BE' => 'België',
+							'DE' => 'Deutchland'
+						] as $iso => $country) { ?>
+						<option value="<?php echo $iso; ?>" <?php echo (router()->value('country')) ? 'selected="selected"' : ''; ?>><?php echo $country; ?></option>
+						<?php } ?>
 					</select>
+					<?php echo (router()->errors('country')) ? '<p class="text-danger">'.router()->errors('country')[0].'</p>' : ''; ?>
 				</div>
 			</div>
 
@@ -52,13 +66,15 @@
 					Stad
 				</label>
 				<div class="col-sm-5">
-					<input class="form-control" type="text" name="city" placeholder="Stad">
+					<input class="form-control" type="text" name="city" placeholder="Stad" value="<?php echo router()->value('city'); ?>">
+					<?php echo (router()->errors('city')) ? '<p class="text-danger">'.router()->errors('city')[0].'</p>' : ''; ?>
 				</div>
 				<label class="col-sm-1 control-label">
 					Postcode
 				</label>
 				<div class="col-sm-3">
-					<input class="form-control" type="text" name="zipcode" placeholder="Postcode">
+					<input class="form-control" type="text" name="zipcode" placeholder="Postcode" value="<?php echo router()->value('zipcode'); ?>">
+					<?php echo (router()->errors('zipcode')) ? '<p class="text-danger">'.router()->errors('zipcode')[0].'</p>' : ''; ?>
 				</div>
 			</div>
 
@@ -67,13 +83,16 @@
 					Straat
 				</label>
 				<div class="col-sm-5">
-					<input class="form-control" type="text" name="city" placeholder="Straat">
+					<input class="form-control" type="text" name="street" placeholder="Straat" value="<?php echo router()->value('street'); ?>">
+					<?php echo (router()->errors('street')) ? '<p class="text-danger">'.router()->errors('street')[0].'</p>' : ''; ?>
 				</div>
 				<div class="col-sm-2">
-					<input class="form-control" type="text" name="city" placeholder="Huisnummer">
+					<input class="form-control" type="text" name="street_number" placeholder="Huisnummer" value="<?php echo router()->value('street_number'); ?>">
+					<?php echo (router()->errors('street_number')) ? '<p class="text-danger">'.router()->errors('street_number')[0].'</p>' : ''; ?>
 				</div>
 				<div class="col-sm-2">
-					<input class="form-control" type="text" name="city" placeholder="Toevoeging">
+					<input class="form-control" type="text" name="street_suffix" placeholder="Toevoeging" value="<?php echo router()->value('street_suffix'); ?>">
+					<?php echo (router()->errors('street_suffix')) ? '<p class="text-danger">'.router()->errors('street_suffix')[0].'</p>' : ''; ?>
 				</div>
 			</div>
 
@@ -82,7 +101,28 @@
 					E-mail adres
 				</label>
 				<div class="col-sm-9">
-					<input class="form-control" type="email" name="email" placeholder="E-mail adres">
+					<input class="form-control" type="email" name="email" placeholder="E-mail adres" value="<?php echo router()->value('email'); ?>">
+					<?php echo (router()->errors('email')) ? '<p class="text-danger">'.router()->errors('email')[0].'</p>' : ''; ?>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">
+					Wachtwoord
+				</label>
+				<div class="col-sm-9">
+					<input class="form-control" type="password" name="password" placeholder="Wachtwoord" value="">
+					<?php echo (router()->errors('password')) ? '<p class="text-danger">'.router()->errors('password')[0].'</p>' : ''; ?>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">
+					Herhaal wachtwoord
+				</label>
+				<div class="col-sm-9">
+					<input class="form-control" type="password" name="password_confirm" placeholder="Wachtwoord bevestigen" value="">
+					<?php echo (router()->errors('password_confirm')) ? '<p class="text-danger">'.router()->errors('password_confirm')[0].'</p>' : ''; ?>
 				</div>
 			</div>
 
