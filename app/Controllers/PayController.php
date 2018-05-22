@@ -50,9 +50,6 @@ Class PayController extends Controller
 					'updated_at' => date('Y-m-d H:i:s')
 			])->insert();
 
-			$mollie = new \Mollie\Api\MollieApiClient();
-			$mollie->setApiKey($this->mollieApiKey); // test api key
-
 			// create an order in the database, update the mollie id after
 			$orderId = db()->query('INSERT INTO `orders`
 				(amount, payment_status, user_id, created_at, updated_at)
@@ -69,6 +66,9 @@ Class PayController extends Controller
 			// But on the server it will not, only on localhost
 			$webhookUrl = (router()->domainName == 'localhost') ? 'https://686079cb.ngrok.io/webshop/public/pay/webhook/'.$orderId : router()->name('pay.webhook', ['orderId' => $orderId]);
 
+			$mollie = new \Mollie\Api\MollieApiClient();
+			$mollie->setApiKey($this->mollieApiKey); // test api key
+
 			// create a mollie api v2 payment: https://github.com/mollie/mollie-api-php
 			$payment = $mollie->payments->create([
 			    "amount" => [
@@ -82,8 +82,9 @@ Class PayController extends Controller
 			]);
 
 			// create an order in the database, add the mollie id
-			db()->query('UPDATE orders SET mollie_id = :mollie_id', [
+			db()->query('UPDATE orders SET mollie_id = :mollie_id WHERE id = :id', [
 				'mollie_id' => $payment->id,
+				'id' => $orderId
 			])->update();
 
 			// put all the products in the database
@@ -158,7 +159,10 @@ Class PayController extends Controller
 			$payment = $mollie->payments->get($mollieId);
 
 	    	// update order in database with new status
-	    	db()->query('UPDATE orders SET payment_status = :payment_status', ['payment_status' => $payment->status])
+	    	db()->query('UPDATE orders SET payment_status = :payment_status WHERE mollie_id = :mollie_id', [
+	    			'payment_status' => $payment->status,
+	    			'mollie_id' => $mollieId,
+		    	])
 	    		->update();
 
 

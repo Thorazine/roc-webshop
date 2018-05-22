@@ -66,9 +66,13 @@ Class Router {
 		// instantiate the wanted controller
 		$controllerClass = new $this->controller;
 
+try {
 		// get the content from the wanted function
 		$response = call_user_func_array([$controllerClass, $this->function], $this->arguments);
-
+}
+catch(Exception $e) {
+	$e->getMessage();
+}
 		// check if we are returning a string or response
 		if(is_object($response)) {
 			$response->print();

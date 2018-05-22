@@ -9,8 +9,8 @@ class Cart {
 			$_SESSION['cart']['products'][$id]['quantity'] += $quantity;
 		}
 		else {
-			$product = db('Product')->select('SELECT * FROM products WHERE id = :id', ['id' => $id])
-				->first();
+			$product = db()->query('SELECT * FROM products WHERE id = :id', ['id' => $id])
+				->first('Product');
 
 			$_SESSION['cart']['products'][$id] = [
 				'quantity' => 1,
